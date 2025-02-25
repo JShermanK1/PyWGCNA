@@ -2998,7 +2998,7 @@ class WGCNA(GeneExp):
                     color = list(sampleInfo[m].values)
                     if type(self.metadataColors[m]) == dict:
                         for n in list(self.metadataColors[m].keys()):
-                            color = [self.metadataColors[m][n] if c == n else c for c in color]
+                            color = [self.metadataColors[m][n] if c.__str__() == n.__str__() else c for c in color]
                             patch = mpatches.Patch(color=self.metadataColors[m][n], label=n)
                             handles.append(patch)
                         axs[0, 0].scatter(x, y, c=color, s=1600, marker='s')
@@ -3157,7 +3157,7 @@ class WGCNA(GeneExp):
                     color = list(cat[m].values)
                     if type(self.metadataColors[m]) == dict:
                         for n in list(self.metadataColors[m].keys()):
-                            color = [self.metadataColors[m][n] if c == n else c for c in color]
+                            color = [self.metadataColors[m][n] if c.__str__() == n.__str__() else c for c in color]
                             patch = mpatches.Patch(color=self.metadataColors[m][n], label=n)
                             handles.append(patch)
                         if m != colorBar:
