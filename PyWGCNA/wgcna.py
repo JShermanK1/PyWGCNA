@@ -3124,7 +3124,7 @@ class WGCNA(GeneExp):
 
                 if colorBar is None:
                     palette = "lightblue"
-                elif type(colorBar) == dict:
+                elif type(self.metadataColors[colorBar]) == dict:
                     palette = cat[[colorBar]].copy()
                     palette.replace(self.metadataColors[colorBar], inplace=True)
                     palette = palette[colorBar].values
