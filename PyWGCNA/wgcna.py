@@ -2851,10 +2851,18 @@ class WGCNA(GeneExp):
                                                      tmp_pvalue.values.flatten())])) \
             .reshape(moduleTraitCor.T.shape)
 
-        sns.set(font_scale=1.5)
-        res = sns.heatmap(moduleTraitCor.T, annot=labels, fmt="", cmap='RdBu_r',
-                          vmin=-1, vmax=1, ax=ax, annot_kws={'size': 20, "weight": "bold"},
-                          xticklabels=xlabels, yticklabels=ylabels)
+        #sns.set(font_scale=1.5)
+        res = sns.heatmap(
+            moduleTraitCor.T, 
+            annot=labels, 
+            fmt="", 
+            cmap='RdBu_r',
+            vmin=-1, vmax=1, 
+            ax=ax, 
+            annot_kws={"weight": "bold"},
+            xticklabels=xlabels, yticklabels=ylabels,
+            square= True
+        )
         res.set_xticklabels(res.get_xmajorticklabels(), fontsize=20, fontweight="bold", rotation=90)
         res.set_yticklabels(res.get_ymajorticklabels(), fontsize=20, fontweight="bold")
         plt.yticks(rotation=0)
