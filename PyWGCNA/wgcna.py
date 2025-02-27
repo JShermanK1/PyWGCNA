@@ -2995,9 +2995,9 @@ class WGCNA(GeneExp):
                     handles = []
                     x = ind
                     y = np.repeat(3000 * metadata.index(m), len(ind))
-                    color = list(sampleInfo[m].values)
+                    color = sampleInfo[m].tolist()
                     if type(self.metadataColors[m]) == dict:
-                        for n in list(self.metadataColors[m].keys()):
+                        for n in self.metadataColors[m].keys():
                             color = [self.metadataColors[m][n] if str(c) == str(n) else c for c in color]
                             patch = mpatches.Patch(color=self.metadataColors[m][n], label=n)
                             handles.append(patch)
@@ -3093,25 +3093,25 @@ class WGCNA(GeneExp):
             print(f"{WARNING}Module name does not exist in {ENDC}")
             return None
         else:
-            ME = pd.DataFrame(self.datME["ME" + moduleName], columns=['eigengeneExp'])
+            ME = self.datME[["ME" + moduleName]].copy(
+                    deep= True
+                ).rename(
+                    columns= {"ME" + moduleName: 'eigengeneExp'}
+                )
 
             if combine:
                 df = ME.copy(deep=True)
                 df[metadata] = sampleInfo[metadata].copy(deep= True)
                 df["all"] = df[metadata].astype(str).apply("_".join, axis= 1)
+                df = df.sort_values("all")
                 cat = df[metadata + ["all"]].drop_duplicates()
                 ybar = df[['all', 'eigengeneExp']].groupby(['all']).mean()['eigengeneExp']
                 ebar = df[['all', 'eigengeneExp']].groupby(['all']).std()['eigengeneExp']
                 ybar = ybar.loc[cat['all']]
                 ebar = ebar.loc[cat['all']]
                 label = list(ybar.index)
-                dot = df[['all', 'eigengeneExp']].copy()
-                ind = {}
-                for i in range(cat.shape[0]):
-                    ind[cat.loc[i, 'all']] = cat.index[i]
-                dot.replace(ind, inplace=True)
-                xdot = dot['all']
-                ydot = dot['eigengeneExp']
+                xdot = df['all']
+                ydot = df['eigengeneExp']
 
                 if colorBar is None:
                     palette = "lightblue"
@@ -3141,7 +3141,7 @@ class WGCNA(GeneExp):
                                                               subplot_spec=ax_legend.get_subplotspec(),
                                                               height_ratios=height_ratios)
 
-                ind = [i for i in range(cat.shape[0])]
+                ind = cat["all"]
                 for m in metadata:
                     handles = []
                     x = ind
@@ -3185,7 +3185,6 @@ class WGCNA(GeneExp):
                 axs[0, 0].grid(False)
                 axs[0, 0].axis('off')
 
-                ind = [i for i in range(cat.shape[0])]
                 axs[1, 0].bar(ind, ybar, align='center', color=palette)
                 axs[1, 0].errorbar(ind, ybar, yerr=ebar, fmt="o", color="r")
                 axs[1, 0].scatter(xdot, ydot, c='black', alpha=0.5)
