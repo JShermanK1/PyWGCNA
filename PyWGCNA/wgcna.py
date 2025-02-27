@@ -2921,11 +2921,11 @@ class WGCNA(GeneExp):
 
     def setMetadataColor(self, col, cmap):
         """
-        set color pallete for each group of metadata
+        set color palette for each group of metadata
 
         :param col: name of metadata
         :type col: str
-        :param cmap: color pallet
+        :param cmap: color palette
         :type cmap: list
         """
         # check if obs_col is even there
@@ -3093,22 +3093,13 @@ class WGCNA(GeneExp):
             print(f"{WARNING}Module name does not exist in {ENDC}")
             return None
         else:
-            ME = pd.DataFrame(self.datME["ME" + moduleName].values, columns=['eigengeneExp'])
+            ME = pd.DataFrame(self.datME["ME" + moduleName], columns=['eigengeneExp'])
 
             if combine:
                 df = ME.copy(deep=True)
-                df['all'] = ''
-                for m in metadata:
-                    df[m] = sampleInfo[m].values
-                    df.sort_values(by=m, inplace=True)
-                    df[m] = df[m].astype(str).str.replace('_', '-') # Replace underscores with dashes
-                    df['all'] = df['all'] + '_' + df[m].astype(str)
-                df['all'] = df['all'].apply(lambda x: x[1:])
-                cat = pd.DataFrame(pd.unique(df['all']), columns=['all'])
-                cat[metadata] = cat['all'].str.split('_', expand=True)
-                for col in cat.columns: # switch back dashes to underscores
-                    cat[col] = cat[col].str.replace('-', '_') # switch back dashes to underscores
-                df['all'] = df['all'].astype(str).str.replace('-', '_') # switch back dashes to underscores
+                df[metadata] = sampleInfo[metadata].copy(deep= True)
+                df["all"] = df[metadata].astype(str).apply("_".join, axis= 1)
+                cat = df[metadata + ["all"]].drop_duplicates()
                 ybar = df[['all', 'eigengeneExp']].groupby(['all']).mean()['eigengeneExp']
                 ebar = df[['all', 'eigengeneExp']].groupby(['all']).std()['eigengeneExp']
                 ybar = ybar.loc[cat['all']]
@@ -3125,14 +3116,15 @@ class WGCNA(GeneExp):
                 if colorBar is None:
                     palette = "lightblue"
                 elif type(self.metadataColors[colorBar]) == dict:
-                    palette = cat[[colorBar]].copy()
+                    palette = cat[colorBar].copy(deep= True)
                     palette.replace(self.metadataColors[colorBar], inplace=True)
-                    palette = palette[colorBar].values
                 else:
-                    palette = cat[[colorBar]].copy()
-                    palette[[colorBar]] = palette[[colorBar]].astype('int')
-                    palette[colorBar] = palette[colorBar].apply(lambda x: mcolors.to_hex(self.metadataColors[colorBar].to_rgba(float(x))) if pd.notna(x) else "#FFFFFF")
-                    palette = palette[colorBar].values
+                    palette = cat[colorBar].copy(deep= True)
+                    palette = palette.astype(
+                        "int"
+                    ).apply(
+                        lambda x: mcolors.to_hex(self.metadataColors[colorBar].to_rgba(float(x))) if pd.notna(x) else "#FFFFFF"
+                    )
 
                 fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(cat.shape[0] + 2, len(metadata) * 4),
                                         sharex='col', gridspec_kw={
