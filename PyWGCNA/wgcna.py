@@ -3146,7 +3146,7 @@ class WGCNA(GeneExp):
                     handles = []
                     x = ind
                     y = np.repeat(3000 * metadata.index(m), len(ind))
-                    color = list(cat[m].values)
+                    color = cat[m].tolist()
                     if type(self.metadataColors[m]) == dict:
                         for n in list(self.metadataColors[m].keys()):
                             color = [self.metadataColors[m][n] if str(c) == str(n) else c for c in color]
